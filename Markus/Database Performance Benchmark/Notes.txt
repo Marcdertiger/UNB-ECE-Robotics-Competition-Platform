@@ -1,0 +1,20 @@
+6/22/2016
+So far, using jesse lite with a class 10 card and mySQL seems to offer
+the best performance to add large amounts of data on a database.
+
+Next: Test single line reads, single line removal.
+
+Removing lines with ie: name = 'Monster' when db has 500+ lines with
+all names are 'Monster'. The delete happens extremely fast on either systems.
+
+Performance of finding a line and removing it is similar on both fullOS
+and liteOS on mySQL.
+
+
+6/23/2016
+After testing read speeds on class 10,4 and gui/lite OS, all seem to perform rapidly. 
+
+Some research has yeilded a regrettable remark: sqlite is not typically recommended for remote database access.
+Insert speeds on sqlite are also slower than mysql, this seems to be a widespread issue with the system.
+
+I will not disregard sqlite this quickly however the above remarks should be strongly considered.
