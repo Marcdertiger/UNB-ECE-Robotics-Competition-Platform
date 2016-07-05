@@ -1,3 +1,4 @@
+
 #
 # Written by Troy T. Lavigne
 #
@@ -29,6 +30,8 @@
 #
 
 
+import random
+from random import randrange
 import zmq
 import sys
 import pygame
@@ -39,6 +42,9 @@ import subprocess
 import RPi.GPIO as GPIO
 from time import sleep
 
+
+
+
 #mode = 0666|stat.S_IRUSR
 
 #
@@ -46,7 +52,7 @@ from time import sleep
 #
 pwmfreq=200	# in Hertz
 Auxpwmlimit=50 # Set PWM value for Aux motors.
-Drivepwmlimit=0.5 # Set MAX value for drive motors
+Drivepwmlimit=1 # Set MAX value for drive motors
 sleeptime=0.02 # delay (in seconds) between PS3 controller readings
 #sleeptime=0.001 # delay (in seconds) between PS3 controller readings
 reversedrive=0 # use Triangle button to reverse drive motors
@@ -133,34 +139,49 @@ PS3_down=6
 PS3_left=7
 
 #
-# zMQ Publisher Setup
+# zMQ Publisher Setup (socketP)
 #
-port = "5555"
+port = "5556"
 if len(sys.argv) > 1:
     port =  sys.argv[1]
     int(port)
 
 context = zmq.Context()
-socket = context.socket(zmq.PUB)
-socket.bind("tcp://*:%s" % port)
-time.sleep(0.5) # Wait for socket to be created
-#print "Starting Publisher on port" % (port)
-topic = '131.202.12.117'
+socketP = context.socket(zmq.PUB)
+socketP.bind("tcp://*:%s" % port)
+topic = "serverclient"
+
+
 
 #
-#mySQL database setup
+#ZMQ Subscriber Setup (socketS)
 #
 
+port = "5555"
+if len(sys.argv) > 1:
+    port =  sys.argv[1]
+    int(port)
+    
+if len(sys.argv) > 2:
+    port1 =  sys.argv[2]
+    int(port1)
+
+# Socket to talk to server
+context = zmq.Context()
+socketS = context.socket(zmq.SUB)
+
+print "Collecting updates from weather server..."
+socketS.connect ("tcp://131.202.12.93:%s" % port)
+
+if len(sys.argv) > 2:
+    socketS.connect ("tcp://131.202.12.93:%s" % port1)
+
+topicfilter = "controller"
+socketS.setsockopt(zmq.SUBSCRIBE, topicfilter)
 
 
 
-
-
-
-
-
-
-
+avalue = 0
 
 
 GPIO.setmode(GPIO.BOARD)
@@ -273,10 +294,24 @@ print ('Initialized Joystick : %s' % j.get_name())
 # Removing locksend_d (free up PUB process to use data)
 #################################################################
 def senddata(count):
-	socket.send("%s %d" % (topic, count))
-	#print "%s %d" % (topic, count)
-	return
+		
+		print "%s %d" % (topic, avalue)
+		print "PS3client-send-to-serverclient"
+		socketP.send("%s %d" % (topic, avalue))
 
+		return
+
+def receivedata():
+    	try:
+	
+		string = socketS.recv(flags=zmq.NOBLOCK)
+   		topic, messagedata = string.split()
+		print "PS3client-receive-from-controller"
+		print (topicfilter,messagedata)
+	except:
+		pass
+
+	return
 
 #
 # Configure the motors to match the current settings.
@@ -347,15 +382,17 @@ try:
     ##########################
 
     while True:
-	if loopcount == 25: # Publish data ~ every 0.5s
+	if loopcount == 4: # Publish data ~ every 0.5s
 		loopcount = 1
 		senddata(loopindex)
+		avalue += 1
+		receivedata()
                 loopindex = loopindex+1
         loopcount = loopcount + 1;
-
+	receivedata()
 #	print loopcount
 
-	sleep(sleeptime) # Test, sleeping 20ms between samples to reduce CPU load
+#	sleep(sleeptime) # Test, sleeping 20ms between samples to reduce CPU load
 
 	#
 	# Time how long the Triangle, X, and Start buttons are pressed

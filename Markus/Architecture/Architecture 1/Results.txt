@@ -1,0 +1,10 @@
+Architecture 1 Test Results
+
+1. Message exchange is stable at reasonable data exchange speed.
+2. Message exchange is stable at extremely high data exchange speed.
+3. At extremely high speed, there is no data "dropped"
+4. The robot drives normally at reasonable data exchange speed.
+5. The robot drives normally at extremely high data exchange speed.
+6. This itteration is 100% non blocking.
+
+This test is a success.
