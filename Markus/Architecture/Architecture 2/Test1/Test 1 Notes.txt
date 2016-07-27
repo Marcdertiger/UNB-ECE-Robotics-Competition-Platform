@@ -1,0 +1,4 @@
+Architecture 2 Test 1 Notes:
+
+1. The ability to exchange information as per the architecture 2 diagaram has been verified.
+2. The ability to retain a non blocking approach on every level of the architecture has been achieved and verified.

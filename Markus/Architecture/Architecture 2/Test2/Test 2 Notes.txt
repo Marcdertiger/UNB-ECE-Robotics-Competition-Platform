@@ -1,0 +1,28 @@
+Architecture 2 Test 2 Notes:
+
+This code has implemented and tested basic functionalities (start/stop/faster/slower) to control the robots.
+There are also : 
+	7/26/2016 -> setup of additional communication channels
+			setup of 1 additional database called "masterControl" which defines the game parameters
+			test current code and db usage.
+		     The implementation of the database insertions has been done within the server-client file. This
+			seems to provide adequate speeds for status updates. Under stress (10-20 messgaes per second), 
+			the system buffers the messages automatically and queues them for database insertion. Once
+			the message flow slows, the server-client writes the remaining messages from the buffer to the
+			database. There are less than 1 status update per second expected to take place per server-client 
+			process. Therefore the speed of operation is adequate. (class 4 sdcard, full os)
+	
+	7/27/2016 -> Test with two robots is a success. data transfert as per test 2 diagram is working great at 
+			about 2 messages per second with little to no delay to database updates.
+		    ***WARNING***
+			Raspberry pi 2's show studder and the inability to receive zmq messages. The same setup for robot2
+			on a raspberry pi 3 works great!
+		    Test 2 is set-up exactly as described in the test 2 architecture diagram. The only thing not 
+			complete is that the controller process generates it's own data to send to the robots.
+
+
+- I think using a topicfilter works great to direct messages to the right place using zmq.
+
+- I will also use a second port with an ID number topicfilter (from masterController DB) which will target robot ID=1 to robot ID=last(up to 16).
+	this way we can either send data to all robots or only one which will reduce risk of impact on performace
+	during high robot count or high message exchange. (TO BE IMPLEMENTED IN ARCHITECTURE 3)
