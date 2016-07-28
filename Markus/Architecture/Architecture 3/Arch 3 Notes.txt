@@ -1,0 +1,30 @@
+Architecture 3
+
+Test 1
+
+- Implement basic masterControl functions like start/stop/slow/fast/disable any motor.(message passing is implemented but not the commands themselves)
+- Implement basic controller controls to send coded commands to robots depending on robot ID (if one robot) or
+	broadcast to all (if start/stop)
+- Add a request field that allows to request a status update from all or just one robot.(controller side done, not robot side)
+
+-masterControl database and control script only sends commands if there is a change in the database fields.
+-Can select to send to all robots (ID field = 60) or to specific robots (ID field = 1 to 16)
+
+- Control commands can be listed in the masterControl table in advance. the report field acts as a select signal
+	to select which command (row) is active as the current robot control command. This can enable two special
+	function (like rfid speed up etc). It can desable auxilary motors from one or all robots. It can stop/start
+	one or all robots. It can also request a status update from one or all robots. (for request. keep all fields
+	except report as NULL (empty) and set the request field to "1". (communication basis is implemented on db/controller
+	but not on robot side.
+
+
+Test 2
+
+
+- Just get basic communication channels working first : like changing masterControl database to start/stop all 
+	robots. (now working 7/28/16) with no stutter !!
+-- Implement PS3 client functions to decode commands and execute them. 
+
+- Implement robot side for all of test 1 controller implementations. 
+
+- Implement a scoreboard script to  be run from the server. This reads and writes to masterController AND status.
