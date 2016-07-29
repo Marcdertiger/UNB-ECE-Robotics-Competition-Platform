@@ -23,8 +23,9 @@ Test 2
 
 - Just get basic communication channels working first : like changing masterControl database to start/stop all 
 	robots. (now working 7/28/16) with no stutter !!
--- Implement PS3 client functions to decode commands and execute them. 
+-- Implement PS3 client functions to decode commands and execute them. (go/stop)
 
 - Implement robot side for all of test 1 controller implementations. 
 
+** This will be done at a later time.
 - Implement a scoreboard script to  be run from the server. This reads and writes to masterController AND status.
