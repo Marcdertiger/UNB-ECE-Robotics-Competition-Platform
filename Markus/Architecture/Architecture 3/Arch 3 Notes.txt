@@ -29,3 +29,8 @@ Test 2
 
 ** This will be done at a later time.
 - Implement a scoreboard script to  be run from the server. This reads and writes to masterController AND status.
+
+
+Test 3
+
+- Same as arch 3 test 1&2. Adds more functionality and stability fixes (such as sleep time in server scripts)
