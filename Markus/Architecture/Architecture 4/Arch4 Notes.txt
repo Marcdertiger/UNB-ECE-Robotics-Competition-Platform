@@ -1,0 +1,5 @@
+Architecture 4 Notes:
+
+- This version is to improve/stabilise current code. Code cleanup also done here.
+- The completed architecture 4 will serve as a base system to support future robotics competitions.
+- 8/3/2016 - Commit has WIP files for Architecture 4. 

@@ -1,3 +1,5 @@
+Architecture 1 Notes:
+
 This test does not incluse proper context termination which can result in getting this error :
 	"Address already in use"
 
