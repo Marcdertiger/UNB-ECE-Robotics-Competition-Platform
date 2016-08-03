@@ -1,5 +1,16 @@
 # UNB-ECE-Robotics-Competition-Plaform
 
+
+#Progress and thoughts (up to architecture 3)
+
+- The whole system would be much improved with an automated "login" process where the robot braudcasts it is on, then transmits a
+	message with it's IP address by zmq (transmit to all (publish)over port 5551...5566 for robot 1..16). The corresponding server_client1..16 would then update an IP and port# field which will be used to set up the port and IP numbers of the connection for any zmq sub that requires an IP. I will try to implement this soon at it may greatly improve the usability of this system(8/3/2016).
+
+
+
+
+
+
 # Architecture 1 Notes:
 
 This test does not incluse proper context termination which can result in getting this error :
