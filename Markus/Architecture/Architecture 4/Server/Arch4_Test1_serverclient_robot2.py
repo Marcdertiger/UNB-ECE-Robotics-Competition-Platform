@@ -1,3 +1,15 @@
+
+#title           :Arch4_Test1_serverclient_robot2.py
+#description     :Read masterControl database, process information then send information to robots.
+#author          :Marc-Andre Couturier
+#date            :Summer 2016
+#version         :4
+#usage           :sudo python Arch4_Test1_serverclient_robot2.py
+#notes           :See architecture 4 diagram for complimentary files and structure.
+#licence		 :Personal use and academic use only. Contact if unsure. 
+#owner			 :UNB Electrical and Computer Engineering under Troy Lavigne.
+#python_version  :2.6.6  
+
 import sys
 import zmq
 import MySQLdb

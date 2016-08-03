@@ -3,7 +3,12 @@
 # Written by Troy T. Lavigne
 #
 # Updated May 4, 2016 (Star Wars day!)
+# 
+#
 # Modified by Marc-Andre Couturier (Summer 2016)
+# (created architecture + message passing using zmq and mysql + GUI for masterControl)
+#
+#
 #
 # Adding ZMQ Publisher
 #

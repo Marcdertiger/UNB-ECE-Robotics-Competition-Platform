@@ -1,15 +1,14 @@
 
-#title           :Arch3_Test3_ControlGUImaster.py
-#description     :Read status table, display information then send commands to masterControl table
+#title           :Arch4_ControlGUImaster.py
+#description     :Read masterControl database, display active robots status, send commands by writing to masterControl database.
 #author          :Marc-Andre Couturier
 #date            :Summer 2016
 #version         :4
-#usage           :sudo python Arch3_Test3_ControlGUImaster.py
+#usage           :sudo python Arch4_ControlGUImaster.py
 #notes           :See architecture 4 diagram for complimentary files and structure.
 #licence		 :Personal use and academic use only. Contact if unsure. 
 #owner			 :UNB Electrical and Computer Engineering under Troy Lavigne.
 #python_version  :2.6.6  
-#!/usr/bin/python
 
 import Tkinter
 from Tkinter import *
@@ -18,10 +17,6 @@ import MySQLdb
 import MySQLdb.cursors
 import time
 from time import sleep
-
-
-
-
 
 #Init global variables
 IDe = ""
