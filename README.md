@@ -20,7 +20,8 @@ This test is a success.
 
 Architecture 1 Diagram
 ![Architecture 1 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%201/Architecture1_Test_1_Diagram.jpg?token=ANNZ91LQHQdlTjavMzQDaMcSpjS0cLfzks5Xqy3ewA%3D%3D)
-
+Note: The pub/sub between the server_client and the controller is not present in the architecture. The controller sends data 
+	based on time intervals to the PS3_client instead.
 # Architecture 2 Test 1 Notes:
 
 1. The ability to exchange information as per the architecture 2 diagaram has been verified.
