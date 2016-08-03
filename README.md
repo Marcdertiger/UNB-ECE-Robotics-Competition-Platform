@@ -18,7 +18,8 @@ Reboot your unix machine to fix the problem.
 
 This test is a success.
 
-![Architecture 1 diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%201/Architecture1_Test_1_Diagram.pdf)
+Architecture 1 Diagram
+![Architecture 1 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%201/Architecture1_Test_1_Diagram.jpg?token=ANNZ91LQHQdlTjavMzQDaMcSpjS0cLfzks5Xqy3ewA%3D%3D)
 
 # Architecture 2 Test 1 Notes:
 
@@ -54,6 +55,13 @@ There are also :
 	this way we can either send data to all robots or only one which will reduce risk of impact on performace
 	during high robot count or high message exchange. (TO BE IMPLEMENTED IN ARCHITECTURE 3)
 
+Architecture 2 Test 1 Diagram
+![Architecture 2 Test 1 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%202/Architecture2_Test_1_Diagram.jpg?token=ANNZ938JOn-FqIpnomGGWxehUX2LEk6sks5Xqy5QwA%3D%3D)
+ 
+ 
+  
+Architecture 2 Test 2 Diagram
+![Architecture 2 Test 2 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%202/Architecture2_Test_2_Diagram.jpg?token=ANNZ99_knjz4rLg3V13Mir_Fnm6qoP5Tks5Xqy59wA%3D%3D)
 
 # Architecture 3
 
@@ -74,6 +82,9 @@ There are also :
 	except report as NULL (empty) and set the request field to "1". (communication basis is implemented on db/controller
 	but not on robot side.
 
+Architecture 3 Test 1 Diagram
+![Architecture 3 Test 1 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%203/Architecture3_Test_1_Diagram.jpg?token=ANNZ9w1Yp2OTe4tNKNH0oAueQU4-bYFXks5Xqy6YwA%3D%3D)
+
 
 #Test 2
 
@@ -88,10 +99,16 @@ There are also :
 - Implement a scoreboard script to  be run from the server. This reads and writes to masterController AND status.
 
 
+
+Architecture 3 Test 2 Diagram
+![Architecture 3 Test 2 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%203/Architecture3_Test_2_Diagram.jpg?token=ANNZ905r9dWC1KYMDSQC9Npz8N_Y3D7gks5Xqy67wA%3D%3D)
+
+
+
 #Test 3
 
 - Same as arch 3 test 1&2. Adds more functionality and stability fixes (such as sleep time in server scripts)
-
+-
 
 
 #Architecture 4 Notes:
