@@ -18,6 +18,8 @@ Reboot your unix machine to fix the problem.
 
 This test is a success.
 
+![Architecture 1 diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%201/Architecture1_Test_1_Diagram.pdf)
+
 # Architecture 2 Test 1 Notes:
 
 1. The ability to exchange information as per the architecture 2 diagaram has been verified.
@@ -92,10 +94,11 @@ There are also :
 
 
 
-# Architecture 4 Notes:
+#Architecture 4 Notes:
 
 - This version is to improve/stabilise current code. Code cleanup also done here.
 - The completed architecture 4 will serve as a base system to support future robotics competitions.
+- 8/3/2016 - Commit has WIP files for Architecture 4. 
 
 
 
