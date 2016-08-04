@@ -3,3 +3,15 @@ Architecture 4 Notes:
 - This version is to improve/stabilise current code. Code cleanup also done here.
 - The completed architecture 4 will serve as a base system to support future robotics competitions.
 - 8/3/2016 - Commit has WIP files for Architecture 4. 
+
+8/4/16:
+
+- Steamline set-up process for users by creating log-in process between PS3client and server_client.
+- Now only need to provide IP address of the server to the robot script by passing a system variable when
+	executing the script.
+- Layed out cautionary actions to prevent ducplicated rows in status database.
+- Layed out cautionary actions to prevent duplicate processes for the same robot when the future server_client_creator script
+	will be added.
+
+server_client_creator: This script will open a single server_client script per robot to enable communication.
+	This script should take ownership of the sign-in process on the server side.

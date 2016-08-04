@@ -129,13 +129,25 @@ Architecture 3 Test 2 Diagram
 - The completed architecture 4 will serve as a base system to support future robotics competitions.
 - 8/3/2016 - Commit has WIP files for Architecture 4. 
 
+8/4/16:
+
+- Steamline set-up process for users by creating log-in process between PS3client and server_client.
+- Now only need to provide IP address of the server to the robot script by passing a system variable when
+	executing the script.
+- Layed out cautionary actions to prevent ducplicated rows in status database.
+- Layed out cautionary actions to prevent duplicate processes for the same robot when the future server_client_creator script
+	will be added.
+
+server_client_creator: This script will open a single server_client script per robot to enable communication.
+	This script should take ownership of the sign-in process on the server side.
 
 
 
 
-# Robotics platform in depth details
 
-Architecture 3, Test 2/3:
+# Robotics platform in depth details (per architecture)
+
+#Architecture 3, Test 2/3:
 -	This design uses the databases (masterControl and status) as the primary data exchange medium on the server side. I think if possible, the use of zMQ from the human interface to the controller may reduce/eliminate lag. Since I have made the decision to hard code play modes (masterControl commands), the need for a database to archive all commands and used to ‘’select’’ the active command would not be necessary. 
 -	The start/stop commands are working.
 -	Is there a need for user controlled commands (other than game mode). Such as : robot 1 slow down. Or is it okay to let the server controller micro-manage specific actions (caused by hall effect switches and rfid tags – through the “special1” and “special2” fields).
@@ -211,6 +223,33 @@ TIP: To make yourself comfortable with the system. Set up 2 robots and observe h
 TIP2: Look at the diagrams of Architecture 3 Test 2. That is how the current design works. This shows from and to for all messages and how all the files fit together. This is the best way to understand the system
 
 
+#Architecture 4
+
+This architecture focusses on creating homogeneous files that do not require modification regardless of the name/IP of each robot. 
+The IP address of the server still has to be known.
+
+-Login
+
+The new design implements basic login between the robots and the server.
+
+1.	Robot will try and access the remote database. There is no bypass in the 8/4/2016 upload.
+2.	The robot will write “25” into the report field of the status table. This indicates to the server that the robot wants to sign-in.
+3.	After a successful insert into the database, the robot exits the log-in loop and looks for a PS3 controller. Then the main loop is executed. This is when the robot starts sending status updates to the server.
+4.	The server, in the meanwhile, was waiting for a field in the same database with which the report field is “25” and deleted all other rows (with name field = robotName argument).
+5.	Once the server has verified the information received it exits the log-in loop and proceeds with updating the robot status row with the information received from the robot.
+6.	The server will override the report field value of the robot status as soon as it exits the log-in loop. This is to prevent the server(once an automated script opens the client processes) to open multiple processes for a single robot. This is there as a fail-safe. 
+-	Positive from this approach is that with MySQL, we know the info from the robot has been written and do not need to wait for a response from the server scripts before going further
+
+-Note: fail-safe protection may be redundant. It is meant to offer the highest reliability possible during play and set-up.
+Running scripts is now slightly different.
+-	The PS3_client file does not need to be modified: all robots will use the same exact file.
+-	The server_client file does not need to be modified: all processe required to communicate with the active robots will use the same exact file.
+This is achieved using system arguments as such:
+PS3_client (write in command line):
+~/sudo python Arch4_PS3client.py robot2 131.202.14.109
+Server_client (write in command line):
+~/Sudo python Arch4_serverclient.py robot2
+Notice that robot2 is the first system argument and that the PS3client requires the IP address of the server! This can be automated through a boot loader and using a local server to fetch the required information. This will be done at a later time.
 
 
 
