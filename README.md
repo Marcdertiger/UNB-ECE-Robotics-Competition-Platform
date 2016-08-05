@@ -156,7 +156,7 @@ server_client_creator: This script will open a single server_client script per r
 - This file takes no arguments to run.
 
 
-![Architecture 5 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%203/Architecture3_Test_2_Diagram.jpg?token=ANNZ905r9dWC1KYMDSQC9Npz8N_Y3D7gks5Xqy67wA%3D%3D)
+![Architecture 5 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%205/Architecture5_Diagram.jpg?token=ANNZ99JCMkWebvv7JwYjxArghN1q3j1zks5XreLGwA%3D%3D)
 Architecture 5 Diagram
 
 
