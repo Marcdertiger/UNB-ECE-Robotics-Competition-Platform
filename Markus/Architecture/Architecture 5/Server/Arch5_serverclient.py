@@ -37,15 +37,7 @@ apwma1=None
 apwma2=None
 
 timeout = 0
-
-#define query statements for db access
-
-insertquery = ("""INSERT INTO status(name,cdate,ctime,enmotors,pwml,pwmr,pwma1,pwma2,report,IP) Values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""")
-deletequery = ("DELETE FROM status WHERE name =%s")
-
-db = MySQLdb.connect("localhost", "robot1", "therobot1", "Controller")
-curs=db.cursor()
-
+trigger=0
 
 #
 #Init ZMQ subscriber 
@@ -71,18 +63,16 @@ socketS.setsockopt(zmq.SUBSCRIBE, topicfilter)
 
 
 def updateDB():
-	curs.execute(deletequery,topicfilter)
-	addLineDB()
+	
+	db = MySQLdb.connect("localhost", "robot1", "therobot1", "Controller")
+	curs=db.cursor()
 
-def addLineDB():
-	curs.execute(insertquery,(aname, cdate, ctime, aenmotor, apwml, apwmr, apwma1, apwma2, astatus, robotIP))
-   	db.commit()
+	curs.execute("""UPDATE status SET cdate=%s,ctime=%s,enmotors=%s,pwml=%s,pwmr=%s,pwma1=%s,pwma2=%s,report=%s,IP=%s WHERE name =%s""",(cdate, ctime, aenmotor, apwml, apwmr, apwma1, apwma2, astatus, robotIP,aname))
+	db.commit()
+	
+	curs.close()
+	db.close()
 
-
-
-#This only runs once to set-up the row associated with this robot!!! (robotName = topicfilter)
-
-addLineDB()
 
 while True:
 	
@@ -90,16 +80,19 @@ while True:
 		string = socketS.recv(flags=zmq.NOBLOCK) 
 		atopic,aname,cdate,ctime,aenmotor,apwml,apwmr,apwma1,apwma2,astatus,robotIP = string.split()
 		print atopic,aname,cdate,ctime,astatus,robotIP
-		
+		trigger=0
 		updateDB()
 
 	except:
 		sleep(0.2)
 		timeout = timeout + 1
-		if timeout == 100: #timeout after 20 second of robot not sending status updates
+		if trigger == 50: #timeout after 10 second of robot not sending status updates. robot status = 100 means offline du to timed out communication
 			print " robot %s time out.",( topicfilter )
+			robotIP= "0"
+			astatus="100"
+			updateDB()
 			quit()
-
+	trigger=trigger+1
 
 
 

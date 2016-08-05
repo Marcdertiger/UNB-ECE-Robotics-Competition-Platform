@@ -41,7 +41,7 @@ varib = 0
 
 
 loggedinrobots= []
-n = 1 #count how many robots have signed in
+n = 0 #count how many robots have signed in
 
 
 while True:
@@ -53,34 +53,37 @@ while True:
 
 		curs.execute("""SELECT name,report,IP from status WHERE report = "25" """)
 		data = curs.fetchone()
-		sleep(0.5)
+		
 
 		try: #if no data fetched, will go to except (throw error at robotname = data[0])
 			robotname = data[0]
 			report = data[1]
 			robotIP = data[2]
-			curs.execute("DELETE FROM status WHERE report != '25' ")
-			db.commit()
-			print robotname,report,robotIP
-
-			#run appropriate serverclient script for the robot that just signed in
-			subprocess.Popen([sys.executable,"./Arch5_serverclient.py",robotname,robotIP])
+			#curs.execute("DELETE FROM status WHERE report != '25' ")
+			#db.commit()
+			#print robotname,report,robotIP
 			
 			#remove the report field 
 			curs.execute("""UPDATE status SET report = '2'WHERE name = %s""",(robotname))
 			db.commit()
 
+			#run appropriate serverclient script for the robot that just signed in
+			subprocess.Popen([sys.executable,"./Arch5_serverclient.py",robotname,robotIP])
+			
+			
 			#add new robot in logged in pool
-			loggedinrobots[n] = robotname
+			loggedinrobots.append(robotname)
 			n = n + 1
-			print "List of logged in robots: " ,loggedinrobots
+			
 			curs.close()
 			db.close()
 			continue
 		except:
+			print "There are ", n," robots logged in."
+			print "List of logged in robots: " ,loggedinrobots
+			sleep(3)
 			curs.close()
 			db.close()
-			sleep(0.5)
 			continue
 			
 		

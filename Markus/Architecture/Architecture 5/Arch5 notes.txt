@@ -1,5 +1,7 @@
 Architecture 5 Notes : 
 
+commit1:8/5/16
+
 - Additional file called Arch5_masterserver.py logs in the robots into the system and opens a single process for 
 	each of the robots connected.
 - The process created by this new file will time-out after 20 seconds of inactivity(robot not sending status updates)
@@ -10,3 +12,12 @@ Architecture 5 Notes :
 	delay must pass before the robot is logged back into the server or else there will be duplicate processe for
 	that robot.
 - This file takes no arguments to run.
+
+commit2:8/5/16
+-Further improvements done to overall sign-in process and database accesses.
+
+Soon:
+-Implement method for the robots to obtain the server IP and their name automatically.
+	Probably a simple wget on a webserver to get a .txt file of the server's IP and name
+	This file will also contain the name the robot should use.
+

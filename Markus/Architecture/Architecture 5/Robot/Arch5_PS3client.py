@@ -1,10 +1,8 @@
 
-
-
 #title           :Arch5_PS3client.py
 #description     :Receive robot data, update robot status table in Controller database.
 #date            :Summer 2016
-#version         :4
+#version         :5
 #usage           :sudo python Arch5_PS3client.py argument1=robotname argument2=serverIP
 #notes           :See architecture 4 diagram for complimentary files and structure.
 #licence		 :Personal use and academic use only. Contact if unsure. 
@@ -216,12 +214,14 @@ print "Log-in for %s with server IP: %s." %( aname, serverIP)
 
 
 
-
 #
 #delete existing entries for this robot in the database. This is to prevent multiple rows per robot if database was not refreshed.
+try:
 
-cursserv.execute("DELETE FROM status WHERE name = %s ", aname)
-sleep(0.4)
+	cursserv.execute("DELETE FROM status WHERE name = %s ", aname)
+except:
+	pass
+
 
 
 #
@@ -235,7 +235,6 @@ while variab==0:
 	try:
 		cursserv.execute(insertquery,( aname, robotIP, '25'))
 		dbserv.commit()
-		sleep(0.2)
 		variab=1
 	except:
 		variab=0

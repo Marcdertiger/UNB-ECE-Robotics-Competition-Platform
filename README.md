@@ -144,24 +144,81 @@ server_client_creator: This script will open a single server_client script per r
 
 #Architecture 5 Notes : 
 
+commit1:8/5/16
+
 - Additional file called Arch5_masterserver.py logs in the robots into the system and opens a single process for 
 	each of the robots connected.
-- The process created by this new file will time-out after 20 seconds of inactivity(robot not sending status updates)
+- The process created by this new file will time-out after 10 seconds of inactivity(robot not sending status updates)
 	This is to prevent multiple processes per robot. 
 - In the event of any problems, the only thing needed is to power cycle the robot itself. The server won't require
 	user intervension. We could also implement a key sequence that would send the log-in signal again as to 
-	remove the need to reboot affected robot. The 20 second delay may be modified in lenght as well, however this
+	remove the need to reboot affected robot. The 10 second delay may be modified in lenght as well, however this
 	delay must pass before the robot is logged back into the server or else there will be duplicate processe for
 	that robot.
 - This file takes no arguments to run.
 
+commit2:8/5/16
+-Further improvements done to overall sign-in process and database accesses.
 
-![Architecture 5 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%205/Architecture5_Diagram.jpg?token=ANNZ99JCMkWebvv7JwYjxArghN1q3j1zks5XreLGwA%3D%3D)
+Soon:
+-Implement method for the robots to obtain the server IP and their name automatically.
+	Probably a simple wget on a webserver to get a .txt file of the server's IP and name
+	This file will also contain the name the robot should use.
+
+
+
+![Architecture 5 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%203/Architecture3_Test_2_Diagram.jpg?token=ANNZ905r9dWC1KYMDSQC9Npz8N_Y3D7gks5Xqy67wA%3D%3D)
 Architecture 5 Diagram
 
 
 
-# Robotics platform in depth details (per architecture)
+# Robotics platform in depth details (per architecture) Recent to older
+
+
+#Architecture 5
+
+There are general improvements and fixes for all files.
+
+New: 
+	-masterserver file to open the processes needed to receive and archive data from the robot.
+	-Inactive robots will time-out after 5-10 seconds(you can modify this in serverclient file).
+	-The graphical interface now displays an inactive robot with it's name field in a red background and white text.
+	-There is no specific order with which turn on the server or the robot.
+		1. The robot waits until it is able to write it's login information on the server (ADD OVERRIDE FOR DEMOS)
+		2. The server waits until a robot entry in the status table has a value of report="25" (login signal)
+		So the order of which is turned on first is insignificant.
+
+
+
+
+
+#Architecture 4
+
+This architecture focusses on creating homogeneous files that do not require modification regardless of the name/IP of each robot. 
+The IP address of the server still has to be known.
+
+-Login
+
+The new design implements basic login between the robots and the server.
+
+1.	Robot will try and access the remote database. There is no bypass in the 8/4/2016 upload.
+2.	The robot will write “25” into the report field of the status table. This indicates to the server that the robot wants to sign-in.
+3.	After a successful insert into the database, the robot exits the log-in loop and looks for a PS3 controller. Then the main loop is executed. This is when the robot starts sending status updates to the server.
+4.	The server, in the meanwhile, was waiting for a field in the same database with which the report field is “25” and deleted all other rows (with name field = robotName argument).
+5.	Once the server has verified the information received it exits the log-in loop and proceeds with updating the robot status row with the information received from the robot.
+6.	The server will override the report field value of the robot status as soon as it exits the log-in loop. This is to prevent the server(once an automated script opens the client processes) to open multiple processes for a single robot. This is there as a fail-safe. 
+-	Positive from this approach is that with MySQL, we know the info from the robot has been written and do not need to wait for a response from the server scripts before going further
+
+-Note: fail-safe protection may be redundant. It is meant to offer the highest reliability possible during play and set-up.
+Running scripts is now slightly different.
+-	The PS3_client file does not need to be modified: all robots will use the same exact file.
+-	The server_client file does not need to be modified: all processe required to communicate with the active robots will use the same exact file.
+This is achieved using system arguments as such:
+PS3_client (write in command line):
+~/sudo python Arch4_PS3client.py robot2 131.202.14.109
+Server_client (write in command line):
+~/Sudo python Arch4_serverclient.py robot2
+Notice that robot2 is the first system argument and that the PS3client requires the IP address of the server! This can be automated through a boot loader and using a local server to fetch the required information. This will be done at a later time.
 
 #Architecture 3, Test 2/3:
 -	This design uses the databases (masterControl and status) as the primary data exchange medium on the server side. I think if possible, the use of zMQ from the human interface to the controller may reduce/eliminate lag. Since I have made the decision to hard code play modes (masterControl commands), the need for a database to archive all commands and used to ‘’select’’ the active command would not be necessary. 
@@ -237,35 +294,6 @@ TIP: To make yourself comfortable with the system. Set up 2 robots and observe h
 
 
 TIP2: Look at the diagrams of Architecture 3 Test 2. That is how the current design works. This shows from and to for all messages and how all the files fit together. This is the best way to understand the system
-
-
-#Architecture 4
-
-This architecture focusses on creating homogeneous files that do not require modification regardless of the name/IP of each robot. 
-The IP address of the server still has to be known.
-
--Login
-
-The new design implements basic login between the robots and the server.
-
-1.	Robot will try and access the remote database. There is no bypass in the 8/4/2016 upload.
-2.	The robot will write “25” into the report field of the status table. This indicates to the server that the robot wants to sign-in.
-3.	After a successful insert into the database, the robot exits the log-in loop and looks for a PS3 controller. Then the main loop is executed. This is when the robot starts sending status updates to the server.
-4.	The server, in the meanwhile, was waiting for a field in the same database with which the report field is “25” and deleted all other rows (with name field = robotName argument).
-5.	Once the server has verified the information received it exits the log-in loop and proceeds with updating the robot status row with the information received from the robot.
-6.	The server will override the report field value of the robot status as soon as it exits the log-in loop. This is to prevent the server(once an automated script opens the client processes) to open multiple processes for a single robot. This is there as a fail-safe. 
--	Positive from this approach is that with MySQL, we know the info from the robot has been written and do not need to wait for a response from the server scripts before going further
-
--Note: fail-safe protection may be redundant. It is meant to offer the highest reliability possible during play and set-up.
-Running scripts is now slightly different.
--	The PS3_client file does not need to be modified: all robots will use the same exact file.
--	The server_client file does not need to be modified: all processe required to communicate with the active robots will use the same exact file.
-This is achieved using system arguments as such:
-PS3_client (write in command line):
-~/sudo python Arch4_PS3client.py robot2 131.202.14.109
-Server_client (write in command line):
-~/Sudo python Arch4_serverclient.py robot2
-Notice that robot2 is the first system argument and that the PS3client requires the IP address of the server! This can be automated through a boot loader and using a local server to fetch the required information. This will be done at a later time.
 
 
 
