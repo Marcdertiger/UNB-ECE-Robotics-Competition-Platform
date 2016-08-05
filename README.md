@@ -142,6 +142,22 @@ server_client_creator: This script will open a single server_client script per r
 	This script should take ownership of the sign-in process on the server side.
 
 
+#Architecture 5 Notes : 
+
+- Additional file called Arch5_masterserver.py logs in the robots into the system and opens a single process for 
+	each of the robots connected.
+- The process created by this new file will time-out after 20 seconds of inactivity(robot not sending status updates)
+	This is to prevent multiple processes per robot. 
+- In the event of any problems, the only thing needed is to power cycle the robot itself. The server won't require
+	user intervension. We could also implement a key sequence that would send the log-in signal again as to 
+	remove the need to reboot affected robot. The 20 second delay may be modified in lenght as well, however this
+	delay must pass before the robot is logged back into the server or else there will be duplicate processe for
+	that robot.
+- This file takes no arguments to run.
+
+
+![Architecture 5 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%203/Architecture3_Test_2_Diagram.jpg?token=ANNZ905r9dWC1KYMDSQC9Npz8N_Y3D7gks5Xqy67wA%3D%3D)
+Architecture 5 Diagram
 
 
 
