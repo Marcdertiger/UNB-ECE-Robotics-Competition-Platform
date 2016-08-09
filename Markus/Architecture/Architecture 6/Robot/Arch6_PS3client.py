@@ -208,7 +208,9 @@ def login():
 	global robotIP
 	
 	
-	hostname=socket.getfqdn() #get hostname of rpi
+	#hostname=socket.getfqdn() #get hostname of rpi
+	hostname=open('/sys/class/net/eth0/address').read() #get wired mac address of rpi
+	#hostname=open('/sys/class/net/wlan0/address').read() #get wireless mac address of rpi
 
 	print hostname
 
@@ -221,11 +223,11 @@ def login():
 	
 		ndata = urllib2.urlopen("http://www.ece.unb.ca/robotics/Robot_Names.txt")
 		for line in ndata:
-			aaname,ahostname = line.split()
-			aaname.replace(" ","") #make sure there are no spaces
+			aaname,ahostname = line.split(" ")
 			if ahostname == hostname:
 				aname = aaname
-				print aname
+				print aname,hostname
+				
 				targettopicfilter = aname
 			
 
@@ -305,7 +307,6 @@ def login():
 						 variab=1
 						 print "Could not send log-in information to server. Enabled: Normal PS3 driving mode."
 			sleep(0.4)
-        
 
 
 
@@ -569,8 +570,6 @@ def mainControl(drive,aux,special1,special2,report,request,override):
 
 		LeftTrack = 0
 		RightTrack = 0
-		Aux1Track = False
-		Aux2Track = False
 
 		if drive == "0":
 			print "stop"
@@ -591,7 +590,7 @@ def mainControl(drive,aux,special1,special2,report,request,override):
 		aenmotor=drive
 	if request == "5":
 		print "slow"
-		Drivepwmlimit= float(special1) # ADD A TRY: EXCEPT: TO CATCH CHARACTERS BEING SENT !!!!!
+		Drivepwmlimit= float(special1) # CAN ADD A CONDITION TO LIMIT THE MAXIMUM VALUE TO 1 AND TO DETECT INVALID ENTRIES
 		override="0"
 
 	return override
