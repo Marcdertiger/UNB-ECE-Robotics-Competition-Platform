@@ -1,0 +1,6 @@
+Architecture 6 Notes : 
+
+Commit 8/9/2016:
+-General fixes.
+-Robot name get automation. (complete log-in automation achieved using http:// server)
+-Files still local to rpi, not downloaded from server (future update)
