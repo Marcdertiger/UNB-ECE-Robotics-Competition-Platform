@@ -3,8 +3,18 @@
 
 #Progress and thoughts (up to architecture 5)
 
-- The whole system would be much improved with an automated "login" process where the robot braudcasts it is on, then transmits a
-	message with it's IP address by zmq (transmit to all (publish)over port 5551...5566 for robot 1..16). The corresponding server_client1..16 would then update an IP and port# field which will be used to set up the port and IP numbers of the connection for any zmq sub that requires an IP. I will try to implement this soon at it may greatly improve the usability of this system(8/3/2016).
+##8/9/2016
+- Totally automated login process added. If no connection to http server or no database access to the gameserver, any robot will run
+	with default PS3 controls. The robot gets it's name from the Robot_Name.txt file on the http server. The hostname of each robot is used to identify who it is. (current format : "robotone","robottwo",...,"robotsixteen".
+	In the future, using the MAC address of each RPI instead of the hostname will make the robot image more portable(no need to
+	change the hostname on each robot, only have to gather all mac addresses the first time we set-up the robot RPI's).
+- General improvemets and fixes.
+- WARNING: Most varialbes used in all code is text based (not numbers). Check for quotes "". 
+- WARNING: Text based variables (string/character...) are case sensitive!
+
+##8/3/2016
+- The whole system would be much improved with a semi-automated "login" process where the robot braudcasts it is on, then transmits a
+	message with it's IP address by zmq (transmit to all (publish)over port 5551...5566 for robot 1..16). The corresponding server_client1..16 would then update an IP and port# field which will be used to set up the port and IP numbers of the connection for any zmq sub that requires an IP. I will try to implement this soon at it may greatly improve the usability of this system.
 
 
 
@@ -18,7 +28,7 @@ This test does not incluse proper context termination which can result in gettin
 
 Reboot your unix machine to fix the problem.
 
-# Architecture 1 Test Results
+## Architecture 1 Test Results
 
 1. Message exchange is stable at reasonable data exchange speed.
 2. Message exchange is stable at extremely high data exchange speed.
@@ -38,7 +48,7 @@ Note: The pub/sub between the server_client and the controller is not present in
 1. The ability to exchange information as per the architecture 2 diagaram has been verified.
 2. The ability to retain a non blocking approach on every level of the architecture has been achieved and verified.
 
-# Architecture 2 Test 2 Notes:
+## Architecture 2 Test 2 Notes:
 
 This code has implemented and tested basic functionalities (start/stop/faster/slower) to control the robots.
 There are also : 
@@ -77,7 +87,7 @@ Architecture 2 Test 2 Diagram
 
 # Architecture 3
 
-#Test 1
+##Test 1
 
 - Implement basic masterControl functions like start/stop/slow/fast/disable any motor.(message passing is implemented but not the commands themselves)
 - Implement basic controller controls to send coded commands to robots depending on robot ID (if one robot) or
@@ -98,7 +108,7 @@ Architecture 3 Test 1 Diagram
 ![Architecture 3 Test 1 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%203/Architecture3_Test_1_Diagram.jpg?token=ANNZ9w1Yp2OTe4tNKNH0oAueQU4-bYFXks5Xqy6YwA%3D%3D)
 
 
-#Test 2
+##Test 2
 
 
 - Just get basic communication channels working first : like changing masterControl database to start/stop all 
@@ -117,7 +127,7 @@ Architecture 3 Test 2 Diagram
 
 
 
-#Test 3
+##Test 3
 
 - Same as arch 3 test 1&2. Adds more functionality and stability fixes (such as sleep time in server scripts)
 
@@ -165,18 +175,6 @@ Soon:
 	Probably a simple wget on a webserver to get a .txt file of the server's IP and name
 	This file will also contain the name the robot should use.
 
-
-
-![Architecture 5 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%203/Architecture3_Test_2_Diagram.jpg?token=ANNZ905r9dWC1KYMDSQC9Npz8N_Y3D7gks5Xqy67wA%3D%3D)
-Architecture 5 Diagram
-
-
-
-# Robotics platform in depth details (per architecture) Recent to older
-
-
-#Architecture 5
-
 There are general improvements and fixes for all files.
 
 New: 
@@ -188,11 +186,76 @@ New:
 		2. The server waits until a robot entry in the status table has a value of report="25" (login signal)
 		So the order of which is turned on first is insignificant.
 
+![Architecture 5 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%203/Architecture3_Test_2_Diagram.jpg?token=ANNZ905r9dWC1KYMDSQC9Npz8N_Y3D7gks5Xqy67wA%3D%3D)
+Architecture 5 Diagram
+
+
+#Architecture 6
+
+There are general improvements and fixes for most files.
+
+New:
+	-Robots now get their names from the http:// server (using hostname of the rpi)
+	
+Future improvements considered:
+	-Instead of hostname, use MAC address. (to make it easier to setup each RPI)
+	-If robot was successful connecting to web server + send it's login info but then the RPI server goes down, we
+		need to make sure the robot will still drive in default mode (aname = "NOSERVER" and default drive variables).
 
 
 
 
-#Architecture 4
+
+
+
+#Data packaging and variable definitions
+
+
+##Data format from server to robot:
+
+ID	drive	aux	Special1	Special2	report	request
+	
+-	ID: This needs to be larger than “0” (zero) for the controller scrip to read the masterControl database. By default, use “1”.
+-	Drive: If drive is “1” and request is “4”, the robot is enabled to drive normally.
+      o	If drive is “0” and request is “4”, the robot is stopped.
+-	Aux: This selects if the auxiliary motors are enables (“1”) or disabled (“0”). Not implemented.
+-	Special1, special2: special commands where RFID tag/hall effect switch responses can be sent back to the robot. Depending on the play mode selected by the control user, these can mean different things. The controller has to implement special1&special2 capabilities in the future.
+-	Report: Refers to the robot number (1..16). Use “60” for all robots.
+      o	This selects either a specific robot to which this command applies or selects to send the command to all robots.
+-	Request: Details what type of request the command line has.
+      o	Request = “1” : return command values to null (default driving mode)
+      o	Request = “2”:  Send robot status to the server.
+      o	Request = “3”: special 1 is used to be a number between “0” and “1”.  This will be multiplied with the drive speed limit to slow a robot by a proportional factor of that value.
+      o	Request = “4”: will either enable the robot to drive normally (drive = “1”) or stop the robot (drive = “0”)
+      o	FUTURE DEVELOPMENT EXPECTED.
+
+
+##Data format from robot to server.
+
+name	cdate	ctime	enmotors	pwml	pwmr	pwma1	pwma2	report
+
+-	name: Name of the robot such as (“robot1”, “robot2”,…, “robot16”). No spaces!!!
+-	cdate: The date
+-	ctime: The time at which the data was sent from the robot.
+-	enmotors: If “1”, motors are enabled. If “0” motors are disables.
+-	pwml: Pulse width modulation left. Shows values from 0 to 100 for pwm of left motor.
+-	pwmr: Pulse width modulation right. Shows values from 0 to 100 for pwm of right motor. 
+-	pwma1: Pulse width modulation auxiliary 1. Shows values from 0 to 100 for pwm of aux 1 motor.
+-	pwma2: Pulse width modulation auxiliary 2. Shows values from 0 to 100 for pwm of aux 2 motor.
+-	report: no specific function at the moment.
+
+CAUTION: Programmers should take note that: the robot script MUST have the sleep delays in the main loop. This is to reduce CPU load and decrease heat on the RPI. Removing the delays may cause overheating and/or catastrophic failure.
+
+CAUTION: All values used are text based. They are surrounded by quotes ie: “1”. To use as a variable of type int, float etc you need to convert from string to int,float,etc.
+
+
+
+
+
+#Older information related to low level details.
+
+
+##Architecture 4
 
 This architecture focusses on creating homogeneous files that do not require modification regardless of the name/IP of each robot. 
 The IP address of the server still has to be known.
@@ -228,10 +291,11 @@ Notice that robot2 is the first system argument and that the PS3client requires 
 
 Data format from server to robot:
 
-ID	drive	aux	Special1	Special2	report	request
+Topic	ID	drive	aux	Special1	Special2	report		request
 	
+-	Topic: This is used by zMQ to determine where/who the message is for. ie: a specific robot (topic=name) or the server(topic = 	controller)
 -	ID: This needs to be larger than “0” (zero) for the controller scrip to read the masterControl database. By default, use “1”.
--	Drive: If drive is “1” and request is “4”, the robot is enabled to drive normally.
+-       Drive: If drive is “1” and request is “4”, the robot is enabled to drive normally.
       o	If drive is “0” and request is “4”, the robot is stopped.
 -	Aux: This selects if the auxiliary motors are enables (“1”) or disabled (“0”). Not implemented.
 -	Special1, special2: special commands where RFID tag/hall effect switch responses can be sent back to the robot. Depending on the play mode selected by the control user, these can mean different things. The controller has to implement special1&special2 capabilities in the future.
@@ -272,7 +336,7 @@ How to: To open the GUI, open a command window, navigate to the directory where 
 
 
 
-#how to get started:
+##how to get started:
 1.	To run the architecture, the server has to have mysql and zmq installed.
 
 2.	The server must have a database called “Controller” and two tables. One called “status” and the other called “masterControl”. Names are case sensitive. See what column names to use above. Be careful, they are case sensitive.
