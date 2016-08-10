@@ -1,21 +1,21 @@
 # UNB-ECE-Robotics-Competition-Plaform
 
 
+#Current State:
+
+##How Login Process Works
 
 
-#How Login Process Works
-
-
-1. The robot will connect to http://ece.unb.ca/robotics and fetch the two text files it needs to 
+1.The robot will connect to http://www.ece.unb.ca/robotics and fetch the two text files it needs to 
 	acquire the address of the RPI server and it’s name.
 	
-2. The robot will insert it’s log-in info into the Controller database, status table. 
+2.The robot will insert it’s log-in info into the Controller database, status table. 
 	It can access the database because it now knows the IP address of the RPI server. The log-in
 	info is identified by a report field of value “25”.
 
 3."masterserver.py" monitors the status table for entries with the report field with value “25”.
 
-4. Once it sees the log-in info, it reads the IP and name and then opens a subprocess for the robot. 
+4.Once it sees the log-in info, it reads the IP and name and then opens a subprocess for the robot. 
 	The subprocess takes care of receiving data from the robot and updating the status table accordingly.
 	Once the log-in info is read, the masterserver.py will change the value to report = “2” to prevent 
 	creating multiple processes per robot.
@@ -23,11 +23,17 @@
 
 
 
+![Architecture 6 Log-in Process](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%206/Architecture6_LOGIN.jpg)
+Log-in Process.
 
+##File structure and communication diagram
 
+Two communication methods have been used:
+	1. zMQ (zeroMQ) for the PUB/SUB messages. Low latency.
+	2. MySQL for Fetch/Insert. Higher latency, useful for monitoring, displaying and updating robot status or active commands.
 
-
-
+![Architecture 6 Diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%206/Architecture6_Diagram.jpg)
+Architecture 6 Diagram
 
 
 #Architecture 6
@@ -35,8 +41,8 @@
 There are general improvements and fixes for most files.
 
 New:
-	-Robots now get their names from the http:// server (using hostname of the robot rpi)
-	-Robots now get their names from the http:// server (using MAC address of the robot rpi) -hostname replaced by MAC
+	1. Robots now get their names from the http:// server (using hostname of the robot rpi)
+	2. Robots now get their names from the http:// server (using MAC address of the robot rpi) -hostname replaced by MAC
 	
 ##8/9/2016
 - Totally automated login process added. If no connection to http server or no database access to the gameserver, any robot will run
@@ -89,7 +95,7 @@ New:
 		2. The server waits until a robot entry in the status table has a value of report="25" (login signal)
 		So the order of which is turned on first is insignificant.
 
-![Architecture 5 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%203/Architecture3_Test_2_Diagram.jpg?token=ANNZ905r9dWC1KYMDSQC9Npz8N_Y3D7gks5Xqy67wA%3D%3D)
+![Architecture 5 Diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%205/Architecture5_Diagram.jpg)
 Architecture 5 Diagram
 
 
@@ -135,7 +141,7 @@ server_client_creator: This script will open a single server_client script per r
 	but not on robot side.
 
 Architecture 3 Test 1 Diagram
-![Architecture 3 Test 1 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%203/Architecture3_Test_1_Diagram.jpg?token=ANNZ9w1Yp2OTe4tNKNH0oAueQU4-bYFXks5Xqy6YwA%3D%3D)
+![Architecture 3 Test 1 Diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%203/Architecture3_Test_1_Diagram.jpg)
 
 
 ##Test 2
@@ -153,7 +159,7 @@ Architecture 3 Test 1 Diagram
 
 
 Architecture 3 Test 2 Diagram
-![Architecture 3 Test 2 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%203/Architecture3_Test_2_Diagram.jpg?token=ANNZ905r9dWC1KYMDSQC9Npz8N_Y3D7gks5Xqy67wA%3D%3D)
+![Architecture 3 Test 2 Diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%203/Architecture3_Test_2_Diagram.jpg)
 
 
 
@@ -168,6 +174,7 @@ Architecture 3 Test 2 Diagram
 
 This code has implemented and tested basic functionalities (start/stop/faster/slower) to control the robots.
 There are also : 
+
 	7/26/2016 -> setup of additional communication channels
 			setup of 1 additional database called "masterControl" which defines the game parameters
 			test current code and db usage.
@@ -194,12 +201,12 @@ There are also :
 	during high robot count or high message exchange. (TO BE IMPLEMENTED IN ARCHITECTURE 3)
 
 Architecture 2 Test 1 Diagram
-![Architecture 2 Test 1 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%202/Architecture2_Test_1_Diagram.jpg?token=ANNZ938JOn-FqIpnomGGWxehUX2LEk6sks5Xqy5QwA%3D%3D)
+![Architecture 2 Test 1 Diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%202/Architecture2_Test_1_Diagram.jpg)
  
  
   
 Architecture 2 Test 2 Diagram
-![Architecture 2 Test 2 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%202/Architecture2_Test_2_Diagram.jpg?token=ANNZ99_knjz4rLg3V13Mir_Fnm6qoP5Tks5Xqy59wA%3D%3D)
+![Architecture 2 Test 2 Diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%202/Architecture2_Test_2_Diagram.jpg)
 
 
 
@@ -224,10 +231,10 @@ Reboot your unix machine to fix the problem.
 This test is a success.
 
 Architecture 1 Diagram
-![Architecture 1 Diagram](https://raw.githubusercontent.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/master/Markus/Architecture/Architecture%201/Architecture1_Test_1_Diagram.jpg?token=ANNZ91LQHQdlTjavMzQDaMcSpjS0cLfzks5Xqy3ewA%3D%3D)
+![Architecture 1 Diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%201/Architecture1_Test_1_Diagram.jpg)
 Note: The pub/sub between the server_client and the controller is not present in the architecture. The controller sends data 
 	based on time intervals to the PS3_client instead.
-# Architecture 2 Test 1 Notes:
+## Architecture 2 Test 1 Notes:
 
 1. The ability to exchange information as per the architecture 2 diagaram has been verified.
 2. The ability to retain a non blocking approach on every level of the architecture has been achieved and verified.
