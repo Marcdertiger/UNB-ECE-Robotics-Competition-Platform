@@ -464,7 +464,7 @@ There are also :
 - I think using a topicfilter works great to direct messages to the right place using zmq.
 
 - I will also use a second port with an ID number topicfilter (from masterController DB) which will target robot ID=1 to robot ID=last(up to 16).
--
+
 	This way we can either send data to all robots or only one which will reduce risk of impact on performace
 	during high robot count or high message exchange. (TO BE IMPLEMENTED IN ARCHITECTURE 3)
 
