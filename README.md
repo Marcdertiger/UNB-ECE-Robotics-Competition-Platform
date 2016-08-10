@@ -29,6 +29,7 @@ Log-in Process.
 ##File structure and communication diagram
 
 Two communication methods have been used:
+
 	1. zMQ (zeroMQ) for the PUB/SUB messages. Low latency.
 	2. MySQL for Fetch/Insert. Higher latency, useful for monitoring, displaying and updating robot status or active commands.
 
