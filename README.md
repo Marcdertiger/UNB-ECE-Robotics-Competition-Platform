@@ -3,7 +3,7 @@
 
 #Current State:
 
-##How Login Process Works
+##How The Login Process Works
 
 
 1.The robot will connect to http://www.ece.unb.ca/robotics and fetch the two text files it needs to 
