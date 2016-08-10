@@ -31,7 +31,8 @@ Log-in Process.
 Two communication methods have been used:
 
 	1. zMQ (zeroMQ) for the PUB/SUB messages. Low latency.
-	2. MySQL for Fetch/Insert. Higher latency, useful for monitoring, displaying and updating robot status or active commands.
+	2. MySQL for Fetch/Insert. Higher latency, useful for monitoring, displaying and updating robot 
+		status or active commands.
 
 ![Architecture 6 Diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%206/Architecture6_Diagram.jpg)
 Architecture 6 Diagram
