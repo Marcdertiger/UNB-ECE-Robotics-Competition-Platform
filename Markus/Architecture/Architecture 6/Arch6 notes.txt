@@ -3,4 +3,14 @@ Architecture 6 Notes :
 Commit 8/9/2016:
 -General fixes.
 -Robot name get automation. (complete log-in automation achieved using http:// server)
+-Robot names are obtained by using the MAC eth0 or wlan0 of each robots.
+
+
+
+
+to do:
 -Files still local to rpi robot and rpi server, not downloaded from web server (future update)
+-Ensure that the robots will still drive when the server goes down (when robot already logged in)
+-One of the biggest flaw of the system is that if the robot is "stopped" by a command and the 
+	server goes down. It will stay stopped until the server is back on and sends a "go" commands.
+	We need to think of a way to deal with short down-times and long down-times.
