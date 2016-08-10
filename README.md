@@ -38,6 +38,35 @@ Two communication methods have been used:
 Architecture 6 Diagram
 
 
+##How to select wired vs wireless internet connection on the robots
+
+The robot script has to get the MAC address of a specific connection. Uncomment the line you want to use and comment what you do not
+plan to use. 
+
+eth0 = Wired connection
+
+wlan0 = Wireless connection
+
+	hostname=open('/sys/class/net/eth0/address').read() #get wired mac address of rpi
+	#hostname=open('/sys/class/net/wlan0/address').read() #get wireless mac address of rpi
+
+The robot also has to acquire the IP address of the robot. You simply need to write either eth0 or wlan0 in this line of code.
+
+	f = os.popen('ifconfig eth0 | grep "inet\ addr" | cut -d: -f2 | cut -d" " -f1')
+	robotIP=f.read()
+
+or
+
+	f = os.popen('ifconfig wlan0 | grep "inet\ addr" | cut -d: -f2 | cut -d" " -f1')
+	robotIP=f.read()
+
+Note: UNB wifi has special requirements that need to be met so a RPI can connect to the network. Speak with someone familiar with
+this to perform the necessary steps. No files/directions will be given freely in this document.
+
+Note: The robot can load the PS3client.py script automatically at reboot. However it is important to note that the @reboot command
+in the crontab (what I have used) needs to be delayed about 60 seconds or more. If the script executes before the wireless connection
+has been made, it will read incorrect IP addresses and will not be able to reach the web server.
+
 #Sample code for message passing
 
 ##zMQ - Server to Robot communication example:
