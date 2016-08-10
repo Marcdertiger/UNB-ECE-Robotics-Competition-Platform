@@ -38,7 +38,235 @@ Two communication methods have been used:
 Architecture 6 Diagram
 
 
-#Architecture 6
+#Sample code for message passing
+
+##zMQ - Server to Robot communication example:
+
+Send data.
+
+	publisher -> 	
+	
+			#zMQ Publisher Setup (socketP)
+			#This code us  run on the server
+			
+			import zmq
+				
+			topic = "robot1"
+			portc = "5551"
+
+			context = zmq.Context()
+			socketP = context.socket(zmq.PUB)
+			socketP.bind("tcp://*:%s" % portc)  #send to any IP on portc
+			
+			socketP.send("%s %s" % (topic,"A message.") #Send two strings separated by a space ("%s %s")
+
+Receive data.
+
+	subscriber ->	
+	
+			#ZMQ Subscriber Setup (socketS) receives general commands
+			#This code is run on the robot
+			
+			import zmq		
+					
+			porta = "5551"
+			serverIP = "131.202.14.109" #This is the address of the sender(publisher)
+			topicfilter = "robot1"
+			
+			# Socket to talk to server
+			context = zmq.Context()
+			socketS = context.socket(zmq.SUB)
+			socketS.connect ("tcp://%s:%s" % (serverIP, porta)) #server IP
+			socketS.setsockopt(zmq.SUBSCRIBE, topicfilter)
+
+			data = socketS.recv(flags=zmq.NOBLOCK) #receive data
+			topic, message = data.split() #We know data is two strings separated by a space
+			
+-This shows how to send two strings. 
+-A topicfilter has been set as a setsockopt on the subscriber side. This will only "accept" messages where the first 
+		element matched the variable topicfilter. This is how targetted commands are done within the system. This is
+		also how general commands are identified (topicfilter = "Controller") in architecture 5-6.
+-A subscriber HAS to know the IP address of the sender to "connect" to the port.
+-A subscriber must "connect" to the port.
+-A publisher DOES NOT need to know the sender's IP. (placing a * instead of an IP tells the socket to braudcast to any IP
+		on the selected port).
+-A publisher MUST "bind" to a port.
+	
+-Note that it is also possible to send data between processes (python scrips) on the same machine using localhost as the IP.
+		For more details, research "zmq localhost python".
+
+##MySQL - Localhost communication example:
+
+Insertion into a Database
+
+	Insert	-> 
+			import MySQLdb
+			
+			aname = "robot1"
+			robotIP = "131.202.14.109"
+			insertquery = ("""INSERT INTO tableName(column1,columnx,columny) Values(%s, %s, %s)""")
+			
+			dbserv = MySQLdb.connect(localhost, "username", "password", "databaseName")
+			cursserv=dbserv.cursor()
+			
+			cursserv.execute(insertquery,( aname, robotIP, '25'))
+			dbserv.commit() #without this, no change will occur
+			cursserv.close() #close the cursor
+			dbserv.close() #close the database connection
+
+Delete from Database
+	
+	Delete	->
+			import MySQLdb
+			
+			aname = "robot1"
+			robotIP = "131.202.14.109"
+			deletequery = ("DELETE FROM tableName WHERE name = %s ", aname)
+			
+			dbserv = MySQLdb.connect(localhost, "username", "password", "databaseName")
+			cursserv=dbserv.cursor()
+			
+			cursserv.execute(deletequery)
+			dbserv.commit() #without this, no change will occur
+			cursserv.close() #close the cursor
+			dbserv.close() #close the database connection
+
+Update a row 
+
+	Update	->
+			import MySQLdb
+			
+			aenmotor = "1"
+			astatus = "OK"
+			aname = "robot1"
+			
+			updatequery = ("""UPDATE tableName SET column1=%s,columnx=%s,columny=%s 
+					WHERE name =%s""",(aenmotor,astatus,aname))
+
+			dbserv = MySQLdb.connect(localhost, "username", "password", "databaseName")
+			cursserv=dbserv.cursor()
+			
+			cursserv.execute(updatequery)
+			dbserv.commit() #without this, no change will occur
+			cursserv.close() #close the cursor
+			dbserv.close() #close the database connection
+		
+-You can access a local database (on the same machine) or a remote one(on an other machine). Use "localhost" for same machine, use
+	the IP address of the host machine for a remote access.
+-Remote access requires the user/password combination to have all privileges granted on the database.
+	see : http://dev.mysql.com/doc/refman/5.7/en/grant.html for specific commands and how-to do this.
+
+-The current architectures use user robot1 and password therobot1 and are granted all privileges (including remote access).
+-The current architectures use 1 single user for all robots (which is ok to do since that user is not root).
+-The current architectures uses the root user on the RPI server host machine. Can change to robot1 for higher security.
+
+#How to set-up the Raspberry pi`s
+	If not "cloning" the existing SDCARDS that are already set-up.
+	
+##Prepare RPI (To-do on both RPI server and each robot RPI)
+
+1.Download Raspbien Jesse Lite and install it on the RPI.
+Files and instructions are found here:	https://www.raspberrypi.org/downloads/raspbian/
+
+2.Once installed, log-in using the standard RPI log-in info : pi,raspberry.
+
+3.Run these commands in order in the command window. If prompted, enter Yes or Y (as per directions on screen).
+	
+Command		-> sudo apt-get update && sudo apt-get upgrade
+			
+--Make sure everything is up to date.
+	
+Command		-> sudo apt-get install mysql-server --fix-missing
+			
+--Install mysql server. You need to create a root password. Use either same psw that has been documented(private file) or document your own.
+	
+Command		-> sudo apt-get install python-mysqldb
+		
+--install python package for mysql
+	
+Command		-> sudo apt-get install python-dev python-pip
+		
+--install python PIP package
+	
+Command		-> sudo pip install pyzmq
+			
+--Install zMQ
+	
+
+##Server Only
+
+###Create Databases
+
+The syntax is no longer the one of a standard unix command window once you have opened the mysql package.
+
+1.Access the MySQL software by using this command Then enter your root password when prompted.
+
+Command	->sudo mysql -u root -p
+
+2.Create the Controller database, the status table and the masterControl table
+	
+MySQL	-> CREATE DATABASE Controller;
+
+MySQL	-> SELECT Controller;
+
+MySQL	-> CREATE TABLE `status` (
+
+  		`name` text,
+  		
+		`cdate` text,
+		
+		`ctime` text,
+		
+		`enmotors` text,
+		
+  		`pwml` text,
+  		
+  		`pwmr` text,
+  		
+  		`pwma1` text,
+  		
+  		`pwma2` text,
+  		
+  		`report` text,
+  		
+  		`IP` text);
+  		
+MySQL  	-> CREATE TABLE `masterControl` (
+
+  		`drive` text,
+  		
+  		`aux` text,
+  		
+  		`special1` text,
+  		
+  		`special2` text,
+  		
+  		`report` text,
+  		
+  		`ID` text,
+  		
+  		`request` text );
+
+3.Create the robot1 user and grant all privileges.
+	
+MySQL	-> CREATE USER 'robot1'@'%' IDENTIFIED BY 'therobot1';
+
+MySQL	-> GRANT ALL ON *.* TO 'robot1'@'%';
+
+MySQL	-> FLUSH PRIVILEGES;
+
+MySQL	-> quit
+
+command -> sudo reboot now
+
+-Once the RPI has restarted, the new user 'robot1' will be active with all privileges.
+
+-Using '%' instead of an IP address allows any user 'robot1' to access the database regardless of
+	what IP address the user tries to access the database.
+	
+#General Notes
+	
+##Architecture 6
 
 There are general improvements and fixes for most files.
 
@@ -46,7 +274,7 @@ New:
 	1. Robots now get their names from the http:// server (using hostname of the robot rpi)
 	2. Robots now get their names from the http:// server (using MAC address of the robot rpi) -hostname replaced by MAC
 	
-##8/9/2016
+###8/9/2016
 - Totally automated login process added. If no connection to http server or no database access to the gameserver, any robot will run
 	with default PS3 controls. The robot gets it's name from the Robot_Name.txt file on the http server. The hostname of each robot is used to identify who it is. (current format : "robotone","robottwo",...,"robotsixteen".
 	In the future, using the MAC address of each RPI instead of the hostname will make the robot image more portable(no need to
@@ -63,7 +291,7 @@ Future improvements considered:
 		need to make sure the robot will still drive in default mode (aname = "NOSERVER" and default drive variables).
 
 
-#Architecture 5 Notes : 
+##Architecture 5 Notes : 
 
 commit1:8/5/16
 
@@ -103,7 +331,7 @@ Architecture 5 Diagram
 
 
 
-#Architecture 4 Notes:
+##Architecture 4 Notes:
 
 - This version is to improve/stabilise current code. Code cleanup also done here.
 - The completed architecture 4 will serve as a base system to support future robotics competitions.
@@ -122,10 +350,9 @@ server_client_creator: This script will open a single server_client script per r
 	This script should take ownership of the sign-in process on the server side.
 
 
+## Architecture 3
 
-# Architecture 3
-
-##Test 1
+$##Test 1
 
 - Implement basic masterControl functions like start/stop/slow/fast/disable any motor.(message passing is implemented but not the commands themselves)
 - Implement basic controller controls to send coded commands to robots depending on robot ID (if one robot) or
@@ -146,7 +373,7 @@ Architecture 3 Test 1 Diagram
 ![Architecture 3 Test 1 Diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%203/Architecture3_Test_1_Diagram.jpg)
 
 
-##Test 2
+###Test 2
 
 
 - Just get basic communication channels working first : like changing masterControl database to start/stop all 
@@ -165,14 +392,14 @@ Architecture 3 Test 2 Diagram
 
 
 
-##Test 3
+###Test 3
 
 - Same as arch 3 test 1&2. Adds more functionality and stability fixes (such as sleep time in server scripts)
 
 
 
 
-## Architecture 2 Test 2 Notes:
+### Architecture 2 Test 2 Notes:
 
 This code has implemented and tested basic functionalities (start/stop/faster/slower) to control the robots.
 There are also : 
@@ -214,14 +441,14 @@ Architecture 2 Test 2 Diagram
 
 
 
-# Architecture 1 Notes:
+## Architecture 1 Notes:
 
 This test does not incluse proper context termination which can result in getting this error :
 	"Address already in use"
 
 Reboot your unix machine to fix the problem.
 
-## Architecture 1 Test Results
+### Architecture 1 Test Results
 
 1. Message exchange is stable at reasonable data exchange speed.
 2. Message exchange is stable at extremely high data exchange speed.
@@ -236,7 +463,7 @@ Architecture 1 Diagram
 ![Architecture 1 Diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%201/Architecture1_Test_1_Diagram.jpg)
 Note: The pub/sub between the server_client and the controller is not present in the architecture. The controller sends data 
 	based on time intervals to the PS3_client instead.
-## Architecture 2 Test 1 Notes:
+### Architecture 2 Test 1 Notes:
 
 1. The ability to exchange information as per the architecture 2 diagaram has been verified.
 2. The ability to retain a non blocking approach on every level of the architecture has been achieved and verified.
@@ -246,7 +473,7 @@ Note: The pub/sub between the server_client and the controller is not present in
 #Data packaging and variable definitions
 
 
-##Data format from server to robot:
+###Data format from server to robot:
 
 ID	drive	aux	  Special1  	Special2 	report	request
 	
@@ -273,7 +500,7 @@ ID	drive	aux	  Special1  	Special2 	report	request
 -The actual selection of the values given to all the data fields above is done in the graphical interface(GUI) python file.
 -The processing of the values in the fields is done on each PS3client python scripts in the mainControl() method.
 
-##Data format from robot to server.
+###Data format from robot to server.
 
 name	cdate	ctime	enmotors	pwml	pwmr	pwma1	pwma2	report
 
@@ -295,5 +522,5 @@ CAUTION: All values used are text based. They are surrounded by quotes ie: â€œ1â
 
 
 
---------------------------------------------------------------------------------------------------------
+
 
