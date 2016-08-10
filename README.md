@@ -533,8 +533,8 @@ ID	drive	aux	  Special1  	Special2 	report	request
 -Aux: This selects if the auxiliary motors are enables (“1”) or disabled (“0”). Not implemented.
 
 -Special1, special2: special commands where RFID tag/hall effect switch responses can be sent back to the robot. 
-		Depending on the play mode selected by the control user, these can mean different things. The controller has 
-		to implement special1&special2 capabilities in the future.
+	o Depending on the play mode selected by the control user, these can mean different things. The controller has 
+	to implement special1&special2 capabilities in the future.
 
 -Report: Refers to the robot number (1..16). Use “60” for all robots.
       o	This selects either a specific robot to which this command applies or selects to send the command to all robots.
@@ -546,9 +546,9 @@ ID	drive	aux	  Special1  	Special2 	report	request
       o	Request = “4”: will either enable the robot to drive normally (drive = “1”) or stop the robot (drive = “0”)
       o	Other request numbers can be used for new commands.
 	  
-- The special1&special2 values are mostly meant to be command variables(select speed, on/off, etc).
-- 
-- The other fields are meant as command select values (select what to do).
+-The special1&special2 values are mostly meant to be command variables(select speed, on/off, etc).
+
+-The other fields are meant as command select values (select what to do).
 
 -The actual selection of the values given to all the data fields above is done in the graphical interface(GUI) python file.
 
