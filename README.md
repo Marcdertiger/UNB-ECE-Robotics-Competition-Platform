@@ -48,17 +48,17 @@ eth0 = Wired connection
 wlan0 = Wireless connection
 
 	hostname=open('/sys/class/net/eth0/address').read() #get wired mac address of rpi
-	#hostname=open('/sys/class/net/wlan0/address').read() #get wireless mac address of rpi
-
-The robot also has to acquire the IP address of the robot. You simply need to write either eth0 or wlan0 in this line of code.
-
-	f = os.popen('ifconfig eth0 | grep "inet\ addr" | cut -d: -f2 | cut -d" " -f1')
-	robotIP=f.read()
-
+	
 or
+	
+	hostname=open('/sys/class/net/wlan0/address').read() #get wireless mac address of rpi
 
-	f = os.popen('ifconfig wlan0 | grep "inet\ addr" | cut -d: -f2 | cut -d" " -f1')
-	robotIP=f.read()
+The robot also has to acquire the IP address of the robot. The command "hostname -I" returns the IP address of an
+active interface (wlan0/eth0...). Will return whatever is connected to the net. This works great with crontab as well.
+Previous methods would not read a valid ip upon boot-up. 
+
+	robotIP = check_output(['hostname','-I']) #This will detect which interface is connected to the internet
+
 
 Note: UNB wifi has special requirements that need to be met so a RPI can connect to the network. Speak with someone familiar with
 this to perform the necessary steps. No files/directions will be given freely in this document.
