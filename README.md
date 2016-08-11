@@ -92,9 +92,18 @@ CAUTION: Programmers should take note that: the robot script MUST have the sleep
 CAUTION: All values used are text based. They are surrounded by quotes ie: “1”. To use as a variable of type int, float etc you need to convert from string to int,float,etc.
 
 
+##Recommendations for future development
 
+1. The overall system does not contain value validation. This means that in the GUI, if an invalid value is entered in the text fields it will generate an exception in other code that converts the string format to an integer/float (PS3client.py). This should be taken care of in the GUI code. 
 
+2. The report field should display actual text describing the current status/debugging state of the system. ie: 1 = running, 2=logged in but has not received status data from the robot yet, 100 = communication time-out/robot not responding, 25 = log-in information sent to server but not processed yet.
 
+3. The GUI must implement dynamic naming for the special1 and special2 fields. This means that the text displayed next to the textboxes must change depending on what value they will effect. ie: if click on slow down, special1 textbox should be named "speed multiplier" and special2 to be named "N/A" for not active.
+-There should be a description of each game when a "play game x" radio button is selected. This way it makes it more intuitive to select a game. 
+
+4. The GUI should open on the current page and let users commit start/stop/slow down (slow down should be renamed game default speed). However, clicking on play Game x will a)stop all robots, b)open a new window c)new window displays a scoreboard tailored to the game selected d)commit button also triggers sending the game parameters such as : exernal signal on/off(hall effect/RFID etc), game default speed, aux motors enable etc. And it should make sure robots are stopped.
+-The scoreboard window has a "start game" button. this button send a "go" signal to the robots to start the game. A timer can be implemented for games where appropriate as well(in GUI script) which can stop the game after x amount of time. A textbox can be added to select the time or it can be hard coded in the background.
+-Game variables should be selected in the scoreboard window before pressing "start game"
 
 ##File structure and communication diagram
 
@@ -106,6 +115,8 @@ Two communication methods have been used:
 
 ![Architecture 6 Diagram](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%206/Architecture6_Diagram.jpg)
 Architecture 6 Diagram
+
+
 
 
 ##How to select wired vs wireless internet connection on the robots
@@ -370,6 +381,12 @@ command -> sudo reboot now
 
 -Using '%' instead of an IP address allows any user 'robot1' to access the database regardless of
 	what IP address the user tries to access the database.
+
+
+
+##How to pair a PS3 controller to a robot
+
+Information to be updated soon.
 
 
 ##Flaws that need to be addressed before "release" on Architecture 6 (latest)
