@@ -1,7 +1,7 @@
 # UNB-ECE-Robotics-Competition-Plaform
 
 
-#Current State:
+#Current State(Architecture 6):
 
 ##How The Login Process Works
 
@@ -25,6 +25,76 @@
 
 ![Architecture 6 Log-in Process](https://github.com/Marcdertiger/UNB-ECE-Robotics-Competition-Platform/blob/master/Markus/Architecture/Architecture%206/Architecture6_LOGIN.jpg)
 Log-in Process.
+
+
+
+#Data packaging and variable definitions
+
+
+###Data format from server to robot:
+
+ID	drive	aux	  Special1  	Special2 	report	request
+	
+-ID: This needs to be larger than “0” (zero) for the controller scrip to read the masterControl database. By default, use “1”.
+
+-Drive: If drive is “1” and request is “4”, the robot is enabled to drive normally.
+          o If drive is “0” and request is “4”, the robot is stopped.
+	  o Can be used in any configuration under different requests.
+
+-Aux: This selects if the auxiliary motors are enables (“1”) or disabled (“0”). Not implemented.
+
+-Special1, special2: special commands where RFID tag/hall effect switch responses can be sent back to the robot. 
+	o Depending on the play mode selected by the control user, these can mean different things. The controller has 
+	to implement special1&special2 capabilities in the future.
+
+-Report: Refers to the robot number (1..16). Use “60” for all robots.
+      o	This selects either a specific robot to which this command applies or selects to send the command to all robots.
+
+-Request: Details what type of request the command line has.
+      o	Request = “1” : return command values to null (default driving mode)
+      o	Request = “2”:  Send robot status to the server.
+      o	Request = “3”: special 1 is used to be a number between “0” and “1”.  This will be multiplied with the drive speed limit to slow a robot by a proportional factor of that value.
+      o	Request = “4”: will either enable the robot to drive normally (drive = “1”) or stop the robot (drive = “0”)
+      o	Other request numbers can be used for new commands.
+	  
+-The special1&special2 values are mostly meant to be command variables(select speed, on/off, etc).
+
+-The other fields are meant as command select values (select what to do).
+
+-The actual selection of the values given to all the data fields above is done in the graphical interface(GUI) python file.
+
+-The processing of the values in the fields is done on each PS3client python scripts in the mainControl() method.
+
+###Data format from robot to server.
+
+name	cdate	ctime	enmotors	pwml	pwmr	pwma1	pwma2	report
+
+-name: Name of the robot such as (“robot1”, “robot2”,…, “robot16”). No spaces in the name itself!!!
+	
+-cdate: The date
+	
+-ctime: The time at which the data was sent from the robot.
+	
+-enmotors: If “1”, motors are enabled. If “0” motors are disables.
+	
+-pwml: Pulse width modulation left. Shows values from 0 to 100 for pwm of left motor.
+	
+-pwmr: Pulse width modulation right. Shows values from 0 to 100 for pwm of right motor. 
+	
+-pwma1: Pulse width modulation auxiliary 1. Shows values from 0 to 100 for pwm of aux 1 motor.
+	
+-pwma2: Pulse width modulation auxiliary 2. Shows values from 0 to 100 for pwm of aux 2 motor.
+	
+-report: no specific function at the moment.
+
+CAUTION: Programmers should take note that: the robot script MUST have the sleep delays in the main loop. This is to reduce CPU load and decrease heat on the RPI. Removing the delays may cause overheating and/or catastrophic failure.
+
+CAUTION: All values used are text based. They are surrounded by quotes ie: “1”. To use as a variable of type int, float etc you need to convert from string to int,float,etc.
+
+
+
+
+
 
 ##File structure and communication diagram
 
@@ -300,6 +370,26 @@ command -> sudo reboot now
 
 -Using '%' instead of an IP address allows any user 'robot1' to access the database regardless of
 	what IP address the user tries to access the database.
+
+
+##Flaws that need to be addressed before "release" on Architecture 6 (latest)
+
+1. When a robot is "stopped" by a command, it will remain "stopped" if the server/internet connection goes down. A reboot
+	is then necessary for the robot to realize there is no path to the server and engage "NOSERVER" driving mode(PS3 controller only).
+
+Number 1 is not as much of a flaw than it may be a feature. I have yet to reflect on the user application and expected behaviour of the system in this regards. A reboot may be the favorable option instead of using a timed trigger(ie: server has not sent data in 20 seconds, must be down). A reboot is possibly favorable to a user triggered action(ie: Press key 'select' for 5 seconds to engage "NOSERVER" driving mode). This will have to be decided by the governing parties of the Robotics Competition to fit their needs.
+
+2. When a robot is sent a command, there may be some movements activated without user input. This is due to NOT returning key driving 	variables to a default value in the mainControl() method in the PS3client.py script. This is where all commands are executed on the 	robot. It would be necessary to remedy this problem before any release.
+
+3. The server currently runs a Class 4 SDCARD on a RPI2. This is not ideal as this architecture is planned to be able to accomodate up 	to 16 robots. Since the wireless access and automated log-in works great, I suggest either using an RPI3 with class10 or even a linux 	machine (remember to change the server_IP.txt file accordingly when changing machines). This recommendation is based on the results 	of database access benchmarks(files available in /Markus/Database Performance Benchmark). MySQL has a certain latency associated 		with opening access to a database and modifying a table. A more powerful server would definately benefit the general 		experience provided by this system.
+
+4. There is a need for creating small scripts to be ran on the robots for external signals such as hall effect switches and RFID tags. 	I believe the best way to do this is to write small python scripts to be placed on the robot. If the "Play game x" selected by the 		controller(user who controls the game through the GUI) enables one or some of the external signals, then the maniControl() 	method can open a subprocess for the applicable external signals(the same way masterServer.py opens server_ client.py on the 			server). The best way to transmit this information would then be to send the reading through zMQ to a GUI interface (on 	the server) that would serve as a scoreboard(using Tkinter for python as I did for the controlGUImaster.py).
+
+5. I have tried to use an RPI2 on the robot itself with poor results. The robot would studder even if I changed sleep times. I 			recommend using RPI3 on the robots as they seem to perform infinately better.
+
+6. (not a flaw, just a comment) The communication structure used (to server,to robot) can be modified. It is easier(I believe) for 		multiple users/new users who want to improve this system if the variables are seperate(as they are now) instead of adoption 	a combined format (ie: data = "name,ID,PWM,report,request").
+
+
 	
 #General Notes
 	
@@ -543,75 +633,6 @@ Note: The pub/sub between the server_client and the controller is not present in
 1. The ability to exchange information as per the architecture 2 diagaram has been verified.
 2. 
 2. The ability to retain a non blocking approach on every level of the architecture has been achieved and verified.
-
-
-
-#Data packaging and variable definitions
-
-
-###Data format from server to robot:
-
-ID	drive	aux	  Special1  	Special2 	report	request
-	
--ID: This needs to be larger than “0” (zero) for the controller scrip to read the masterControl database. By default, use “1”.
-
--Drive: If drive is “1” and request is “4”, the robot is enabled to drive normally.
-          o If drive is “0” and request is “4”, the robot is stopped.
-	  o Can be used in any configuration under different requests.
-
--Aux: This selects if the auxiliary motors are enables (“1”) or disabled (“0”). Not implemented.
-
--Special1, special2: special commands where RFID tag/hall effect switch responses can be sent back to the robot. 
-	o Depending on the play mode selected by the control user, these can mean different things. The controller has 
-	to implement special1&special2 capabilities in the future.
-
--Report: Refers to the robot number (1..16). Use “60” for all robots.
-      o	This selects either a specific robot to which this command applies or selects to send the command to all robots.
-
--Request: Details what type of request the command line has.
-      o	Request = “1” : return command values to null (default driving mode)
-      o	Request = “2”:  Send robot status to the server.
-      o	Request = “3”: special 1 is used to be a number between “0” and “1”.  This will be multiplied with the drive speed limit to slow a robot by a proportional factor of that value.
-      o	Request = “4”: will either enable the robot to drive normally (drive = “1”) or stop the robot (drive = “0”)
-      o	Other request numbers can be used for new commands.
-	  
--The special1&special2 values are mostly meant to be command variables(select speed, on/off, etc).
-
--The other fields are meant as command select values (select what to do).
-
--The actual selection of the values given to all the data fields above is done in the graphical interface(GUI) python file.
-
--The processing of the values in the fields is done on each PS3client python scripts in the mainControl() method.
-
-###Data format from robot to server.
-
-name	cdate	ctime	enmotors	pwml	pwmr	pwma1	pwma2	report
-
--name: Name of the robot such as (“robot1”, “robot2”,…, “robot16”). No spaces in the name itself!!!
-	
--cdate: The date
-	
--ctime: The time at which the data was sent from the robot.
-	
--enmotors: If “1”, motors are enabled. If “0” motors are disables.
-	
--pwml: Pulse width modulation left. Shows values from 0 to 100 for pwm of left motor.
-	
--pwmr: Pulse width modulation right. Shows values from 0 to 100 for pwm of right motor. 
-	
--pwma1: Pulse width modulation auxiliary 1. Shows values from 0 to 100 for pwm of aux 1 motor.
-	
--pwma2: Pulse width modulation auxiliary 2. Shows values from 0 to 100 for pwm of aux 2 motor.
-	
--report: no specific function at the moment.
-
-CAUTION: Programmers should take note that: the robot script MUST have the sleep delays in the main loop. This is to reduce CPU load and decrease heat on the RPI. Removing the delays may cause overheating and/or catastrophic failure.
-
-CAUTION: All values used are text based. They are surrounded by quotes ie: “1”. To use as a variable of type int, float etc you need to convert from string to int,float,etc.
-
-
-
-
 
 
 
