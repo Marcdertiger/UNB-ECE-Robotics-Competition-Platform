@@ -369,7 +369,7 @@ MySQL  	-> CREATE TABLE `masterControl` (
 	
 MySQL	-> CREATE USER 'robot1'@'%' IDENTIFIED BY 'therobot1';
 
-MySQL	-> GRANT ALL ON *.* TO 'robot1'@'%';
+MySQL	-> GRANT ALL ON * TO 'robot1'@'%';
 
 MySQL	-> FLUSH PRIVILEGES;
 
