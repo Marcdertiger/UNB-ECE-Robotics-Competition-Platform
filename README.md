@@ -325,7 +325,7 @@ Command	->sudo mysql -u root -p
 	
 MySQL	-> CREATE DATABASE Controller;
 
-MySQL	-> SELECT Controller;
+MySQL	-> USE Controller;
 
 MySQL	-> CREATE TABLE `status` (
 
