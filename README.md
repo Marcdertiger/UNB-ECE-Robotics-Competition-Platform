@@ -387,7 +387,7 @@ command -> sudo reboot now
 ##How to pair a PS3 controller to a robot
 
 Review document named "PS3 Controller Pairing.docx" found in the main project directory.
-
+Credits to Troy Lavigne(UNB).
 
 ##Flaws that need to be addressed before "release" on Architecture 6 (latest)
 
